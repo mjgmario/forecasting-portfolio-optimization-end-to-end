@@ -29,9 +29,7 @@ jobs:
         run: uv python install ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
-        run: |
-          uv sync --all-extras
-          uv pip install --system .
+        run: uv sync --all-extras
 
   lint:
     name: Code Quality
@@ -51,9 +49,7 @@ jobs:
         run: uv python install ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
-        run: |
-          uv sync --extra dev
-          uv pip install --system .
+        run: uv sync --extra dev
 
       - name: Cache pre-commit environments
         uses: actions/cache@v4
@@ -82,22 +78,19 @@ jobs:
         run: uv python install ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
-        run: |
-          uv sync
-          uv pip install --system pip-audit
+        run: uv sync --extra dev
 
       - name: Run pip-audit (vulnerability scan)
         run: |
           echo "Scanning dependencies for known vulnerabilities..."
-          pip-audit --strict --desc || {
+          uv run pip-audit --strict --desc || {
             echo "::warning::Vulnerabilities found in dependencies. Review and update as needed."
             exit 0  # Don't fail CI, just warn
           }
 
       - name: Run bandit (code security scan)
         run: |
-          uv pip install --system bandit
-          bandit -r src -ll -f txt || {
+          uv run bandit -r src -ll -f txt || {
             echo "::warning::Security issues found by bandit. Review the output above."
             exit 0  # Don't fail CI, just warn
           }
@@ -122,7 +115,6 @@ jobs:
       - name: Build and verify package
         run: |
           uv sync
-          uv pip install --system .
           uv run python -c "
           import src
           from src.forecasters import ForecasterRegistry
