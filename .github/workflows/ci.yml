@@ -1,127 +1,33 @@
-name: CI - Tests and Linting
+name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: ["*"]
   pull_request:
-    branches: [main, develop]
-  workflow_dispatch:
-
-env:
-  PYTHON_VERSION: '3.12'
+    branches: ["*"]
 
 jobs:
   test:
-    name: Run Tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          version: "0.5.11"
-          enable-cache: true
-
       - name: Set up Python
-        run: uv python install ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
       - name: Install dependencies
         run: uv sync --all-extras
 
-  lint:
-    name: Code Quality
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          version: "0.5.11"
-          enable-cache: true
-
-      - name: Set up Python
-        run: uv python install ${{ env.PYTHON_VERSION }}
-
-      - name: Install dependencies
-        run: uv sync --extra dev
-
-      - name: Cache pre-commit environments
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ env.PYTHON_VERSION }}-${{ hashFiles('.pre-commit-config.yaml') }}
-
       - name: Run pre-commit
-        run: uv run pre-commit run --all-files --show-diff-on-failure
+        run: uv run pre-commit run --all-files
 
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          version: "0.5.11"
-          enable-cache: true
-
-      - name: Set up Python
-        run: uv python install ${{ env.PYTHON_VERSION }}
-
-      - name: Install dependencies
-        run: uv sync --extra dev
-
-      - name: Run pip-audit (vulnerability scan)
-        run: |
-          echo "Scanning dependencies for known vulnerabilities..."
-          uv run pip-audit --strict --desc || {
-            echo "::warning::Vulnerabilities found in dependencies. Review and update as needed."
-            exit 0  # Don't fail CI, just warn
-          }
-
-      - name: Run bandit (code security scan)
-        run: |
-          uv run bandit -r src -ll -f txt || {
-            echo "::warning::Security issues found by bandit. Review the output above."
-            exit 0  # Don't fail CI, just warn
-          }
-
-  build-check:
-    name: Build Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          version: "0.5.11"
-          enable-cache: true
-
-      - name: Set up Python
-        run: uv python install ${{ env.PYTHON_VERSION }}
-
-      - name: Build and verify package
-        run: |
-          uv sync
-          uv run python -c "
-          import src
-          from src.forecasters import ForecasterRegistry
-          from src.allocators import AllocatorRegistry
-          from src.evaluation import metrics, backtesting
-          from src import database, extractor, processor, settings
-          print('✓ All imports successful')
-          print('✓ Available forecasters:', len(ForecasterRegistry.list_all()))
-          print('✓ Available allocators:', len(AllocatorRegistry.list_all()))
-          "
+      - name: Run tests
+        run: uv run pytest
