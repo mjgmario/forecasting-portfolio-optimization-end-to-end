@@ -1,0 +1,66 @@
+# Paper Trading Configuration
+# Use for simulated trading without real money.
+# Mimics production settings but with more logging.
+
+execution:
+  mode: single
+  save_to_db: true  # Track paper trades
+  horizon: 5  # Weekly rebalancing
+  verbose: true
+
+portfolio:
+  # Same portfolio as production
+  risk:
+    minimum_allocation: 0.05
+    maximum_allocation: 0.30
+    risk_aversion: 6
+
+dates:
+  start_date: "2022-01-01"
+  end_date: null
+
+forecasters:
+  default: lightgbm
+  mode: single
+  training_mode: individual
+
+  skip:
+    - nbeats
+    - nhits
+    - prophet
+
+  configs:
+    lightgbm:
+      n_estimators: 500
+      learning_rate: 0.03
+      max_depth: 8
+      num_leaves: 31
+      min_child_samples: 20
+      lags: 20
+      windows: [5, 10, 20, 60]
+
+allocators:
+  default: robust_markowitz
+
+  configs:
+    robust_markowitz:
+      risk_aversion: 1.5
+      min_weight: 0.02
+      max_weight: 0.25
+      covariance_shrinkage: 0.15
+      return_shrinkage: 0.25
+      regularization: 0.01
+      lookback: 252
+
+backtesting:
+  initial_train_size: 252
+  test_size: 5  # Weekly forecast
+  step_size: 5  # Weekly rebalancing
+  min_train_size: 60
+
+database:
+  mode: neon
+  table_name: stock_optimisation_paper
+
+logging:
+  level: INFO

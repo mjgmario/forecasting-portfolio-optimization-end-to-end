@@ -1,0 +1,419 @@
+# Default Configuration for Portfolio Forecasting & Optimization
+# This file contains all configurable parameters for the system.
+# Copy to config/local.yaml for custom settings (gitignored).
+
+# =============================================================================
+# Execution Settings
+# =============================================================================
+execution:
+  # Run mode: "single", "compare", or "comprehensive"
+  # - single: Run one forecaster + one allocator
+  # - compare: Compare multiple forecasters via backtesting
+  # - comprehensive: All forecasters × all allocators
+  mode: single
+
+  # Save results to database
+  save_to_db: true
+
+  # Forecast horizon in trading days (used in comprehensive mode)
+  horizon: 21  # ~1 month
+
+  # Verbose output
+  verbose: true
+
+# =============================================================================
+# Portfolio Settings
+# =============================================================================
+portfolio:
+  # List of tickers to include in the portfolio
+  tickers:
+    # Tech Giants
+    - AAPL
+    - MSFT
+    - AMZN
+    - GOOG
+    - META
+    - NVDA
+    - TSM
+    - AVGO
+    - ASML
+    # Semiconductors
+    - AMD
+    - INTC
+    - QCOM
+    - MU
+    - MRVL
+    - ADI
+    - AMAT
+    - LRCX
+    - ARM
+    - SMCI
+    # AI & Quantum Computing
+    - PLTR
+    - IBM
+    - RGTI
+    - QBTS
+    - IONQ
+    - ARQQ
+    - CRDO
+    # Cloud & Software
+    - NFLX
+    - ANET
+    - ESTC
+    - ISRG
+    - TRMB
+    - SITM
+    # EV & Energy
+    - TSLA
+    - CVX
+    - HES
+    - MP
+    - ARRY
+    # Finance & Others
+    - JPM
+    - NU
+    - HWM
+    # Small caps & Speculative
+    - CRI
+    - TALK
+    - PAYS
+    - ATYR
+    # ETFs
+    - VGT
+    # Canadian
+    - TOU.TO
+
+  # Risk parameters
+  risk:
+    minimum_allocation: 0.05  # Minimum 5% per asset
+    maximum_allocation: 1.0   # Maximum 100% per asset
+    risk_aversion: 5          # Risk aversion coefficient (higher = more conservative)
+
+# =============================================================================
+# Date Settings
+# =============================================================================
+dates:
+  start_date: "2024-01-01"  # Historical data start date
+  end_date: null            # null = use current date
+
+# =============================================================================
+# Forecasters Configuration
+# =============================================================================
+forecasters:
+  # Default forecaster to use (used when mode is "single")
+  default: lightgbm
+
+  # Mode: "single" (use default), "auto" (select best from candidates), or "ensemble"
+  mode: auto
+
+  # Training mode: "individual" (train per ticker) or "combined" (train on all tickers)
+  # - individual: Each ticker gets its own model trained on its data
+  # - combined: One model trained on all tickers' data (more data, captures cross-asset patterns)
+  training_mode: individual
+
+  # Per-ticker forecaster mapping (optional)
+  # Use this to assign different forecasters to specific tickers
+  # Tickers not listed will use the default forecaster
+  per_ticker:
+    # Example:
+    # AAPL: lightgbm
+    # TSLA: xgboost  # More volatile stocks might need different models
+    # NVDA: catboost
+
+  # Forecasters to evaluate when mode is "auto" or "ensemble"
+  # The best performer (by directional accuracy) will be selected
+  candidates:
+    - naive
+    - drift
+    - ets
+    - theta
+    - arima
+    - xgboost
+    - lightgbm
+    - catboost
+    - random_forest
+
+  # Metric to use for auto-selection: "directional_accuracy", "mase", "rmse", "mae"
+  selection_metric: directional_accuracy
+
+  # Number of backtest steps for auto-selection (more = slower but more reliable)
+  selection_backtest_steps: 30
+
+  # Forecasters to skip during comprehensive analysis (computationally expensive)
+  skip:
+    - nbeats   # Deep learning - requires GPU/significant compute
+    - nhits    # Deep learning - requires GPU/significant compute
+    - prophet  # Slow on large datasets
+
+  # Individual forecaster configurations (OPTIMIZED DEFAULTS)
+  configs:
+    # Baseline forecasters
+    naive:
+      # No parameters needed
+
+    seasonal_naive:
+      season_length: 5  # 5 days = weekly pattern
+
+    drift:
+      # No parameters needed
+
+    # Statistical forecasters
+    ets:
+      season_length: 1    # 1 = no seasonality for daily returns
+      model: "ZZZ"        # ZZZ = auto-select
+
+    theta:
+      season_length: 1
+      decomposition_type: additive
+
+    arima:
+      seasonal: false
+      approximation: true
+      max_p: 5
+      max_q: 5
+      max_d: 2
+
+    prophet:
+      yearly_seasonality: true
+      weekly_seasonality: true
+      daily_seasonality: false
+      changepoint_prior_scale: 0.05
+
+    # Machine Learning forecasters (OPTIMIZED)
+    ridge:
+      lags: 20
+      windows: [5, 10, 20, 60]
+      alpha: 1.0
+
+    lasso:
+      lags: 20
+      windows: [5, 10, 20, 60]
+      alpha: 0.01
+
+    elasticnet:
+      lags: 20
+      windows: [5, 10, 20, 60]
+      alpha: 0.1
+      l1_ratio: 0.5
+
+    random_forest:
+      n_estimators: 500
+      max_depth: 20
+      min_samples_split: 5
+      min_samples_leaf: 2
+      lags: 20
+      windows: [5, 10, 20, 60]
+      n_jobs: -1
+
+    hist_gradient_boosting:
+      max_iter: 500
+      max_depth: 15
+      learning_rate: 0.03
+      min_samples_leaf: 20
+      lags: 20
+      windows: [5, 10, 20, 60]
+
+    xgboost:
+      n_estimators: 500
+      learning_rate: 0.03
+      max_depth: 8
+      min_child_weight: 3
+      subsample: 0.8
+      colsample_bytree: 0.8
+      reg_alpha: 0.1
+      reg_lambda: 1.0
+      lags: 20
+      windows: [5, 10, 20, 60]
+      n_jobs: -1
+
+    lightgbm:
+      n_estimators: 500
+      learning_rate: 0.03
+      max_depth: 10
+      num_leaves: 31
+      min_child_samples: 20
+      subsample: 0.8
+      colsample_bytree: 0.8
+      reg_alpha: 0.1
+      reg_lambda: 1.0
+      lags: 20
+      windows: [5, 10, 20, 60]
+      n_jobs: -1
+
+    catboost:
+      iterations: 500
+      learning_rate: 0.03
+      depth: 8
+      l2_leaf_reg: 3.0
+      bagging_temperature: 1.0
+      lags: 20
+      windows: [5, 10, 20, 60]
+      verbose: false
+
+    # Volatility forecasters
+    garch:
+      p: 1
+      q: 1
+
+    egarch:
+      p: 1
+      q: 1
+
+    gjr_garch:
+      p: 1
+      o: 1
+      q: 1
+
+    # Deep Learning forecasters (expensive)
+    nbeats:
+      input_size: 60
+      h: 1
+      max_epochs: 100
+      batch_size: 32
+
+    nhits:
+      input_size: 60
+      h: 1
+      max_epochs: 100
+      batch_size: 32
+
+# =============================================================================
+# Allocators Configuration
+# =============================================================================
+allocators:
+  # Default allocator to use
+  default: robust_markowitz
+
+  # Individual allocator configurations
+  configs:
+    equal_weight:
+      # No parameters needed
+
+    inverse_volatility:
+      lookback: 60
+      min_weight: 0.0
+      max_weight: 1.0
+
+    risk_parity:
+      min_weight: 0.01
+      max_weight: 1.0
+      lookback: 252
+
+    minimum_variance:
+      min_weight: 0.0
+      max_weight: 1.0
+      lookback: 252
+      regularization: 0.0
+
+    maximum_diversification:
+      min_weight: 0.0
+      max_weight: 1.0
+      lookback: 252
+
+    markowitz:
+      risk_aversion: 1.0
+      min_weight: 0.0
+      max_weight: 1.0
+      lookback: 252
+
+    robust_markowitz:
+      risk_aversion: 1.0
+      min_weight: 0.0
+      max_weight: 1.0
+      covariance_shrinkage: 0.1
+      return_shrinkage: 0.2
+      regularization: 0.01
+      lookback: 252
+
+    max_sharpe:
+      risk_free_rate: 0.02
+      min_weight: 0.0
+      max_weight: 1.0
+      lookback: 252
+
+    black_litterman:
+      risk_aversion: 2.5
+      tau: 0.025
+      min_weight: 0.0
+      max_weight: 1.0
+      lookback: 252
+      view_confidence: 0.25
+
+    hrp:
+      lookback: 252
+      linkage: single
+      min_weight: 0.0
+      max_weight: 1.0
+
+    cvar:
+      alpha: 0.95
+      min_weight: 0.0
+      max_weight: 1.0
+      lookback: 252
+
+    kelly_criterion:
+      fraction: 0.5
+      risk_free_rate: 0.02
+      min_weight: 0.0
+      max_weight: 1.0
+      lookback: 252
+
+    mean_cvar:
+      target_cvar: 0.05
+      alpha: 0.95
+      min_weight: 0.0
+      max_weight: 1.0
+      lookback: 252
+      return_weight: 1.0
+
+    omega_ratio:
+      threshold: 0.0
+      min_weight: 0.0
+      max_weight: 1.0
+      lookback: 252
+
+# =============================================================================
+# Backtesting Configuration
+# =============================================================================
+backtesting:
+  # Walk-forward backtest settings
+  initial_train_size: 252   # ~1 year of trading days
+  test_size: 1              # Predict 1 day ahead
+  step_size: 1              # Roll forward 1 day at a time
+  min_train_size: 60        # Minimum training data required
+
+  # For model comparison
+  comparison:
+    step_size: 20           # Roll forward 20 days (monthly rebalancing)
+
+# =============================================================================
+# Database Configuration
+# =============================================================================
+database:
+  mode: neon                # 'neon' for PostgreSQL, 'local' for SQLite
+  table_name: stock_optimisation_store
+
+# =============================================================================
+# Logging Configuration
+# =============================================================================
+logging:
+  level: INFO               # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# =============================================================================
+# Prophet-specific Settings (Holiday names mapping)
+# =============================================================================
+prophet:
+  holiday_name_map:
+    "New Year's Day": new_years
+    "Dr. Martin Luther King Jr. Day": mlk_day
+    "Good Friday": good_friday
+    "Memorial Day": memorial_day
+    "July 4th": independence_day
+    "Labor Day": labor_day
+    "Thanksgiving": thanksgiving
+    "Election Day": election_day
+    "Veteran Day": veterans_day
+    "Columbus Day": columbus_day
+    "Christmas": christmas
+    "Christmas Day": christmas

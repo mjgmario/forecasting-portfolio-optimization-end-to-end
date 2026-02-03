@@ -1,0 +1,145 @@
+# Pre-commit hooks for code quality
+# Install: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+      - id: end-of-file-fixer
+        name: Fix end of files
+      - id: check-yaml
+        name: Check YAML syntax
+      - id: check-toml
+        name: Check TOML syntax
+      - id: check-json
+        name: Check JSON syntax
+        exclude: ^\.vscode/
+      - id: check-added-large-files
+        name: Check for large files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+      - id: check-case-conflict
+        name: Check for case conflicts
+      - id: mixed-line-ending
+        name: Check mixed line endings
+        args: ['--fix=lf']
+      - id: detect-private-key
+        name: Detect private keys
+
+  # Secret detection (more comprehensive than detect-private-key)
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: (\.env\.example|tests/.*|\.lock)$
+
+  # Validate GitHub Actions workflows
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.27.3
+    hooks:
+      - id: check-github-workflows
+        name: Validate GitHub Actions workflows
+
+  # Python code formatting with Black
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        name: Format code with Black
+        language_version: python3.12
+        args: ['--line-length=100']
+
+  # Python linting with Ruff (includes import sorting)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.15
+    hooks:
+      - id: ruff
+        name: Lint with Ruff
+        args: ['--fix', '--exit-non-zero-on-fix']
+
+  # Type checking with mypy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        name: Type check with mypy
+        additional_dependencies:
+          - types-requests
+          - types-PyYAML
+          - pandas-stubs
+          - numpy
+        args:
+          - --ignore-missing-imports
+          - --no-strict-optional
+          - --warn-unused-ignores
+        exclude: ^(tests/|docs/|scripts/|src/streamlit_dashboard\.py)
+
+  # Security checks with bandit
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        name: Security check with bandit
+        args: ['-c', 'pyproject.toml']
+        additional_dependencies: ['bandit[toml]']
+        exclude: ^tests/
+
+  # Docstring checks with pydocstyle (enabled with numpy convention)
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        name: Check docstrings
+        args:
+          - --convention=numpy
+          - --add-ignore=D100,D101,D102,D103,D104,D105,D107,D200,D205,D212,D400,D401,D406,D407
+        exclude: ^(tests/|docs/|scripts/|src/streamlit_dashboard\.py)
+
+  # Check for common Python mistakes
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-check-blanket-noqa
+        name: Check blanket noqa
+      - id: python-check-blanket-type-ignore
+        name: Check blanket type ignore
+      - id: python-use-type-annotations
+        name: Use type annotations
+      - id: python-no-eval
+        name: No eval()
+      - id: python-no-log-warn
+        name: No log.warn()
+
+# Configuration
+default_language_version:
+  python: python3.12
+
+# Performance
+default_stages: [pre-commit, pre-push]
+fail_fast: false
+
+# Exclude patterns
+exclude: |
+  (?x)^(
+      \.git/|
+      \.github/|
+      \.venv/|
+      \.uv/|
+      __pycache__/|
+      \.pytest_cache/|
+      \.mypy_cache/|
+      \.ruff_cache/|
+      htmlcov/|
+      dist/|
+      build/|
+      .*\.egg-info/|
+      migrations/|
+      alembic/
+  )

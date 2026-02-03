@@ -1,0 +1,70 @@
+# Debug Configuration
+# Use for debugging issues and understanding model behavior.
+# Minimal data, maximum verbosity, simple models.
+
+execution:
+  mode: single
+  save_to_db: false  # Never save debug runs
+  horizon: 1  # Single step for easy debugging
+  verbose: true
+
+# Minimal portfolio for debugging
+portfolio:
+  tickers:
+    - AAPL
+    - MSFT
+    - GOOGL
+
+  risk:
+    minimum_allocation: 0.1
+    maximum_allocation: 1.0
+    risk_aversion: 5
+
+dates:
+  start_date: "2024-01-01"  # Very recent, minimal data
+  end_date: null
+
+forecasters:
+  default: naive  # Simplest model for debugging
+  mode: single
+  training_mode: individual
+
+  # Skip all complex models
+  skip:
+    - nbeats
+    - nhits
+    - prophet
+    - catboost
+    - lightgbm
+    - xgboost
+    - garch
+    - egarch
+    - gjr_garch
+    - arima
+    - ets
+    - theta
+
+  configs:
+    naive: {}
+
+    ridge:
+      lags: 5
+      windows: [5]
+      alpha: 1.0
+
+allocators:
+  default: equal_weight  # Simplest allocator
+
+backtesting:
+  initial_train_size: 30  # Minimal training
+  test_size: 1
+  step_size: 10  # Large steps for quick debug
+  min_train_size: 20
+
+database:
+  mode: local
+  table_name: stock_optimisation_debug
+
+logging:
+  level: DEBUG  # Maximum verbosity
+  format: "%(asctime)s [%(levelname)s] %(name)s:%(lineno)d - %(message)s"

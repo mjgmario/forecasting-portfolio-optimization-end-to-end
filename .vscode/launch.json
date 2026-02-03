@@ -1,0 +1,684 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        // =====================================================================
+        // EJECUCIONES PRINCIPALES
+        // =====================================================================
+        {
+            "name": "Main: Default (Config)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Main: Single Forecast",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--allocator", "equal_weight",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Main: Compare Forecasters",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "compare",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Main: Comprehensive Analysis",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "comprehensive",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // FORECASTERS - BASELINES
+        // =====================================================================
+        {
+            "name": "Forecaster: Naive",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Forecaster: Seasonal Naive",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "seasonal_naive",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Forecaster: Drift",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "drift",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // FORECASTERS - ML
+        // =====================================================================
+        {
+            "name": "Forecaster: Ridge",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "ridge",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Forecaster: Random Forest",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "random_forest",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Forecaster: XGBoost",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "xgboost",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Forecaster: LightGBM",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "lightgbm",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // FORECASTERS - STATISTICAL
+        // =====================================================================
+        {
+            "name": "Forecaster: ETS",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "ets",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Forecaster: ARIMA",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "arima",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // FORECASTERS - VOLATILITY
+        // =====================================================================
+        {
+            "name": "Forecaster: GARCH",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "garch",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // ALLOCATORS
+        // =====================================================================
+        {
+            "name": "Allocator: Equal Weight",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--allocator", "equal_weight",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Allocator: Risk Parity",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--allocator", "risk_parity",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Allocator: Markowitz",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--allocator", "markowitz",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Allocator: HRP",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--allocator", "hrp",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Allocator: CVaR",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--allocator", "cvar",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Allocator: Black-Litterman",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--allocator", "black_litterman",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // TRAINING MODES
+        // =====================================================================
+        {
+            "name": "Training: Individual (per ticker)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "ridge",
+                "--training-mode", "individual",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Training: Combined (all tickers)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "ridge",
+                "--training-mode", "combined",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // UTILITY COMMANDS
+        // =====================================================================
+        {
+            "name": "List: Forecasters",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": ["--list-forecasters"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "List: Allocators",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": ["--list-allocators"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // CUSTOM TICKERS
+        // =====================================================================
+        {
+            "name": "Custom: Tech Giants",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "ridge",
+                "--allocator", "risk_parity",
+                "--tickers", "AAPL", "MSFT", "GOOGL", "NVDA", "META",
+                "--horizon", "5",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Custom: Minimal (2 tickers)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--allocator", "equal_weight",
+                "--tickers", "AAPL", "MSFT",
+                "--horizon", "1",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // HORIZON VARIATIONS
+        // =====================================================================
+        {
+            "name": "Horizon: 1 day",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--horizon", "1",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Horizon: 21 days (1 month)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--horizon", "21",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // TESTS
+        // =====================================================================
+        {
+            "name": "Test: All Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "tests/",
+                "-v",
+                "--tb=short"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Test: Unit Tests Only",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "tests/",
+                "-v",
+                "--tb=short",
+                "-m", "not integration",
+                "--ignore=tests/test_integration.py"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Test: Integration Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "tests/test_integration.py",
+                "-v",
+                "--tb=short"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Test: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "${file}",
+                "-v",
+                "--tb=short"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // STREAMLIT DASHBOARD
+        // =====================================================================
+        {
+            "name": "Streamlit: Dashboard",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "streamlit",
+            "args": [
+                "run",
+                "src/streamlit_dashboard.py",
+                "--server.port", "8501"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+
+        // =====================================================================
+        // DEBUG CONFIGURATIONS (verbose logging)
+        // =====================================================================
+        {
+            "name": "Debug: Verbose Single Run",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "naive",
+                "--allocator", "equal_weight",
+                "--tickers", "AAPL", "MSFT",
+                "--horizon", "1",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "LOG_LEVEL": "DEBUG"
+            }
+        },
+        {
+            "name": "Debug: With Breakpoints",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.main",
+            "args": [
+                "--mode", "single",
+                "--forecaster", "ridge",
+                "--tickers", "AAPL",
+                "--horizon", "1",
+                "--no-save"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "stopOnEntry": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "LOG_LEVEL": "DEBUG"
+            }
+        }
+    ]
+}

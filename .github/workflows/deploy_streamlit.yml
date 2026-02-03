@@ -1,0 +1,162 @@
+name: Deploy Streamlit Dashboard
+
+on:
+  # Manual deployment
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+  # Deploy on push to main (optional - uncomment if needed)
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'src/streamlit_dashboard.py'
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  deploy:
+    name: Deploy to Streamlit Cloud
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Display deployment info
+        run: |
+          echo "=============================================="
+          echo "🚀 STREAMLIT DEPLOYMENT"
+          echo "=============================================="
+          echo "Environment: ${{ github.event.inputs.environment || 'production' }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "=============================================="
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.11"
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+          uv pip install --system .
+
+      - name: Validate Streamlit app
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "Validating Streamlit app can import correctly..."
+          uv run python -c "
+          import sys
+          sys.path.insert(0, '.')
+          from src.streamlit_dashboard import main
+          print('✓ Streamlit app imports successfully')
+          "
+
+      - name: Create requirements.txt for Streamlit Cloud
+        run: |
+          # Generate requirements.txt from uv lock file for Streamlit Cloud
+          uv export --format requirements-txt --no-hashes > requirements.txt
+          echo "Generated requirements.txt for Streamlit Cloud deployment"
+
+      - name: Deploy instructions
+        run: |
+          echo "=============================================="
+          echo "📋 DEPLOYMENT INSTRUCTIONS"
+          echo "=============================================="
+          echo ""
+          echo "To deploy to Streamlit Cloud:"
+          echo ""
+          echo "1. Go to https://share.streamlit.io/"
+          echo "2. Connect your GitHub repository"
+          echo "3. Set the following:"
+          echo "   - Main file path: src/streamlit_dashboard.py"
+          echo "   - Python version: 3.12"
+          echo ""
+          echo "4. Add secrets in Streamlit Cloud settings:"
+          echo "   DATABASE_URL = <your Neon connection string>"
+          echo ""
+          echo "Alternatively, for local testing:"
+          echo "   uv run streamlit run src/streamlit_dashboard.py"
+          echo ""
+          echo "=============================================="
+
+      - name: Test database connection
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -n "$DATABASE_URL" ]; then
+            echo "Testing database connection..."
+            uv run python -c "
+            from src.database import get_db
+            db = get_db()
+            db.create_tables()
+            print('✓ Database connection successful')
+            size = db.get_database_size()
+            if 'total_size_mb' in size:
+                print(f'  Database size: {size[\"total_size_mb\"]:.2f} MB')
+            "
+          else
+            echo "⚠️ DATABASE_URL not set - skipping database test"
+          fi
+
+  cleanup:
+    name: Database Cleanup (Weekly)
+    runs-on: ubuntu-latest
+    # Only run cleanup on manual trigger with production environment
+    if: github.event.inputs.environment == 'production'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.11"
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+          uv pip install --system .
+
+      - name: Cleanup old data (keep 30 days)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "Cleaning up old data to stay within Neon 0.5GB limit..."
+          uv run python -c "
+          from src.database import get_db
+
+          db = get_db()
+
+          # Check size before cleanup
+          size_before = db.get_database_size()
+          print(f'Database size before cleanup: {size_before.get(\"total_size_mb\", \"N/A\")} MB')
+
+          # Cleanup data older than 30 days
+          deleted = db.cleanup_old_data(days_to_keep=30)
+          print(f'Deleted records: {deleted}')
+
+          # Check size after cleanup
+          size_after = db.get_database_size()
+          print(f'Database size after cleanup: {size_after.get(\"total_size_mb\", \"N/A\")} MB')
+          "

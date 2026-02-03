@@ -1,0 +1,73 @@
+# Production Configuration
+# Use for live portfolio management and real trading decisions.
+# Prioritizes accuracy and reliability over speed.
+
+execution:
+  mode: single
+  save_to_db: true
+  horizon: 21  # 1 month forecast
+  verbose: false  # Reduce noise in production
+
+# Use full portfolio
+portfolio:
+  risk:
+    minimum_allocation: 0.05
+    maximum_allocation: 0.30  # More conservative max allocation
+    risk_aversion: 7  # Higher risk aversion in production
+
+dates:
+  start_date: "2020-01-01"  # More historical data for robust training
+  end_date: null
+
+forecasters:
+  default: lightgbm
+  mode: single
+  training_mode: individual
+
+  # Conservative skip list - avoid experimental models
+  skip:
+    - nbeats
+    - nhits
+    - prophet
+    - catboost  # If not well-tested
+
+  configs:
+    lightgbm:
+      n_estimators: 1000  # More trees for production
+      learning_rate: 0.01  # Lower LR for stability
+      max_depth: 8
+      num_leaves: 31
+      min_child_samples: 30  # More samples per leaf
+      subsample: 0.8
+      colsample_bytree: 0.8
+      reg_alpha: 0.1
+      reg_lambda: 1.0
+      lags: 30  # More lags
+      windows: [5, 10, 20, 60, 120]
+      n_jobs: -1
+
+allocators:
+  default: robust_markowitz
+
+  configs:
+    robust_markowitz:
+      risk_aversion: 2.0
+      min_weight: 0.02
+      max_weight: 0.25  # Stricter diversification
+      covariance_shrinkage: 0.2  # More shrinkage for stability
+      return_shrinkage: 0.3
+      regularization: 0.02
+      lookback: 504  # 2 years
+
+backtesting:
+  initial_train_size: 504  # 2 years
+  test_size: 1
+  step_size: 1
+  min_train_size: 126  # 6 months minimum
+
+database:
+  mode: neon
+  table_name: stock_optimisation_production
+
+logging:
+  level: WARNING  # Only warnings and errors in production

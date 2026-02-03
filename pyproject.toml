@@ -1,0 +1,201 @@
+[project]
+name = "forecasting-end-to-end"
+version = "2.0.0"
+description = "End-to-end pipeline for financial return forecasting and portfolio allocation with multi-model comparison, walk-forward backtesting, and interactive Streamlit dashboard"
+authors = [{name = "Mario Jimenez"}]
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+
+dependencies = [
+    # Core scientific computing (upper bounds prevent major version breaks)
+    "numpy>=1.24.0,<3.0.0",
+    "pandas>=2.0.0,<3.0.0",
+    "scipy>=1.11.0,<2.0.0",
+
+    # Data sources
+    "yfinance>=0.2.28,<1.0.0",
+    "pandas-market-calendars>=5.1.3,<6.0.0",
+
+    # Database (Neon PostgreSQL)
+    "psycopg2-binary>=2.9.0,<3.0.0",
+    "sqlalchemy>=2.0.0,<3.0.0",
+    "alembic>=1.13.0,<2.0.0",
+
+    # Forecasting - Statistical & Baselines
+    "statsforecast>=1.7.0,<2.0.0",
+    "arch>=7.0.0,<8.0.0",
+
+    # Forecasting - Machine Learning
+    "scikit-learn>=1.3.0,<2.0.0",
+    "xgboost>=2.0.0,<3.0.0",
+    "lightgbm>=4.0.0,<5.0.0",
+    "catboost>=1.2.0,<2.0.0",
+    "prophet>=1.1.5,<2.0.0",
+
+    # Forecasting - Deep Learning
+    "torch>=2.0.0,<3.0.0",
+    "neuralforecast>=1.7.0,<2.0.0",
+
+    # Portfolio Optimization
+    "cvxpy>=1.5.0,<2.0.0",
+
+    # Visualization & Dashboard
+    "streamlit>=1.28.0,<2.0.0",
+    "plotly>=6.4.0,<7.0.0",
+    "altair>=5.5.0,<6.0.0",
+    "matplotlib>=3.7.0,<4.0.0",
+    "seaborn>=0.12.0,<1.0.0",
+
+    # Utilities
+    "tqdm>=4.66.0,<5.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+    "pyyaml>=6.0.0,<7.0.0",
+]
+
+[project.optional-dependencies]
+# Note: PyTorch and neuralforecast are now in main dependencies
+
+# Development tools
+dev = [
+    "pytest>=7.4.0,<9.0.0",
+    "pytest-cov>=4.1.0,<6.0.0",
+    "pytest-mock>=3.11.0,<4.0.0",
+    "pytest-xdist>=3.3.0,<4.0.0",
+    "black>=23.7.0,<25.0.0",
+    "ruff>=0.0.285,<1.0.0",
+    "mypy>=1.5.0,<2.0.0",
+    "isort>=5.12.0,<6.0.0",
+    "bandit[toml]>=1.7.0,<2.0.0",
+    "pre-commit>=3.4.0,<4.0.0",
+    "ipykernel>=6.25.0,<7.0.0",
+]
+
+# Jupyter notebook support
+notebook = [
+    "jupyter>=1.0.0,<2.0.0",
+    "ipykernel>=6.25.0,<7.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "N",  # pep8-naming
+    "UP", # pyupgrade
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/forecasters/ml_regressors.py" = ["N806"]  # Allow X, y variable names in ML code
+"src/forecasters/ml_features.py" = ["N806"]  # Allow X, y variable names
+"src/allocators/models.py" = ["N806", "F841"]  # Allow matrix names and unused vars in optimization
+"src/database.py" = ["UP038"]  # Allow old isinstance style
+"scripts/*.py" = ["E402"]  # Allow imports after sys.path modification
+"tests/*.py" = ["N802", "N806", "UP038"]  # Allow uppercase function/variable names in tests
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+ignore_missing_imports = true
+# Exclude files with many existing type errors (to fix incrementally)
+exclude = [
+    "tests/",
+    "scripts/",
+    "src/streamlit_dashboard.py",
+]
+
+# Per-module overrides for pandas/numpy heavy modules
+[[tool.mypy.overrides]]
+module = [
+    "src.forecasters.statistical",
+    "src.forecasters.ml_regressors",
+    "src.forecasters.ml_features",
+    "src.forecasters.base",
+    "src.forecasters.prophet",
+    "src.forecasters.volatility",
+    "src.forecasters.deep_learning",
+    "src.allocators.models",
+    "src.allocators.base",
+    "src.evaluation.backtesting",
+    "src.evaluation.metrics",
+    "src.extractor",
+    "src.main",
+]
+disable_error_code = ["arg-type", "assignment", "attr-defined", "operator", "var-annotated", "return-value", "call-arg"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--strict-markers",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+]
+
+[tool.coverage.report]
+# Fail if coverage drops below 60% (current baseline)
+# Increase this as coverage improves
+fail_under = 60
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+skip_gitignore = true
+skip = [".venv", ".uv", "__pycache__", ".pytest_cache", ".mypy_cache"]
+
+[tool.bandit]
+exclude_dirs = ["tests", "docs", ".venv", ".uv", "scripts"]
+skips = ["B101", "B601", "B404", "B603", "B607"]  # Skip assert, shell injection, subprocess warnings
+
+[tool.pydocstyle]
+convention = "numpy"
+add_ignore = ["D100", "D101", "D102", "D103", "D104", "D105", "D107"]

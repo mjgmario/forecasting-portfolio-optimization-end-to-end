@@ -1,0 +1,58 @@
+{
+    // Python Settings
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "python.terminal.activateEnvironment": true,
+
+    // Testing
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+        "tests",
+        "-v",
+        "--tb=short"
+    ],
+
+    // Formatting
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+
+    // Linting
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+
+    // Files
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        ".pytest_cache": true,
+        "*.egg-info": true,
+        ".mypy_cache": true,
+        ".ruff_cache": true,
+        "htmlcov": true,
+        "lightning_logs": true
+    },
+
+    // Terminal
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}"
+    },
+
+    // Editor
+    "editor.rulers": [88, 100],
+    "editor.wordWrap": "off",
+
+    // Search
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/.venv": true,
+        "**/htmlcov": true,
+        "**/lightning_logs": true,
+        "**/.pytest_cache": true
+    }
+}

@@ -1,0 +1,46 @@
+# Full Comparison Profile
+# Runs ALL forecasters (except deep learning) x ALL allocators
+# Uses combined training mode (one model trained on all tickers' data)
+#
+# Usage:
+#   python -m src.main --config config/ --mode comprehensive
+#   # Or via profile system:
+#   # get_config(profile="full_comparison")
+
+# =============================================================================
+# Execution Settings
+# =============================================================================
+execution:
+  mode: comprehensive
+  save_to_db: false          # Local comparison run — no DB writes
+  horizon: 21               # ~1 month forecast horizon
+  verbose: true
+
+# =============================================================================
+# Forecasters Configuration
+# =============================================================================
+forecasters:
+  default: lightgbm
+  mode: single
+  training_mode: combined    # Train one model on all tickers' data
+
+  # Only skip deep learning models (GPU/compute-intensive)
+  skip:
+    - nbeats
+    - nhits
+
+portfolio:
+  tickers:
+    - AAPL
+    - MSFT
+    - GOOGL
+# =============================================================================
+# Backtesting Configuration
+# =============================================================================
+backtesting:
+  initial_train_size: 252
+  test_size: 1
+  step_size: 5              # Step every 5 days for faster comparison runs
+  min_train_size: 60
+  comparison:
+    step_size: 20

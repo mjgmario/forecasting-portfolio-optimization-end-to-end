@@ -1,0 +1,83 @@
+# Backtest Configuration
+# Use for comprehensive backtesting and model comparison.
+# Prioritizes thorough evaluation over speed.
+
+execution:
+  mode: compare  # Compare multiple forecasters
+  save_to_db: true
+  horizon: 21
+  verbose: true
+
+portfolio:
+  risk:
+    minimum_allocation: 0.05
+    maximum_allocation: 1.0
+    risk_aversion: 5
+
+dates:
+  start_date: "2020-01-01"  # Long history for robust backtesting
+  end_date: null
+
+forecasters:
+  default: lightgbm
+  mode: auto  # Auto-select best forecaster per ticker
+  training_mode: individual
+
+  candidates:
+    - naive
+    - drift
+    - ridge
+    - lasso
+    - random_forest
+    - hist_gradient_boosting
+    - xgboost
+    - lightgbm
+
+  selection_metric: directional_accuracy
+  selection_backtest_steps: 60  # More steps for reliable selection
+
+  skip:
+    - nbeats
+    - nhits
+    - prophet
+    - catboost
+
+  configs:
+    lightgbm:
+      n_estimators: 300
+      learning_rate: 0.05
+      max_depth: 8
+      lags: 20
+      windows: [5, 10, 20, 60]
+
+    xgboost:
+      n_estimators: 300
+      learning_rate: 0.05
+      max_depth: 6
+      lags: 20
+      windows: [5, 10, 20, 60]
+
+    random_forest:
+      n_estimators: 200
+      max_depth: 15
+      lags: 20
+      windows: [5, 10, 20, 60]
+
+allocators:
+  default: robust_markowitz
+
+backtesting:
+  initial_train_size: 252  # 1 year
+  test_size: 1
+  step_size: 1  # Daily rolling for accurate backtest
+  min_train_size: 60
+
+  comparison:
+    step_size: 5  # Weekly steps for comparison
+
+database:
+  mode: neon
+  table_name: stock_optimisation_backtest
+
+logging:
+  level: INFO

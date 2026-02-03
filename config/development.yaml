@@ -1,0 +1,74 @@
+# Development Configuration
+# Use for development and testing new features.
+# Balanced between speed and accuracy.
+
+execution:
+  mode: single
+  save_to_db: false  # Don't save to DB during development
+  horizon: 5  # Shorter horizon for quick tests
+  verbose: true
+
+# Smaller portfolio for faster iteration
+portfolio:
+  tickers:
+    - AAPL
+    - MSFT
+    - GOOGL
+    - AMZN
+    - NVDA
+    - META
+    - TSLA
+    - JPM
+    - VGT
+    - AMD
+
+  risk:
+    minimum_allocation: 0.05
+    maximum_allocation: 1.0
+    risk_aversion: 5
+
+dates:
+  start_date: "2023-01-01"  # Less historical data for speed
+  end_date: null
+
+forecasters:
+  default: ridge  # Fast model for development
+  mode: single
+  training_mode: individual
+
+  skip:
+    - nbeats
+    - nhits
+    - prophet
+    - garch
+    - egarch
+    - gjr_garch
+
+  configs:
+    ridge:
+      lags: 10
+      windows: [5, 20]
+      alpha: 1.0
+
+    xgboost:
+      n_estimators: 100
+      learning_rate: 0.1
+      max_depth: 6
+      lags: 10
+      windows: [5, 20]
+
+allocators:
+  default: equal_weight  # Simple allocator for testing
+
+backtesting:
+  initial_train_size: 60
+  test_size: 1
+  step_size: 5  # Skip steps for speed
+  min_train_size: 30
+
+database:
+  mode: local  # Local SQLite for development
+  table_name: stock_optimisation_dev
+
+logging:
+  level: DEBUG  # Full debug output
